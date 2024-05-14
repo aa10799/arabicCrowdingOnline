@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Arabic Letter Position Experiment</title>
+  
+  <!-- Include jsPsych library and plugins -->
+  <script src="https://unpkg.com/jspsych@7.3.3" type="text/javascript"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.3/svg.min.js"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-virtual-chinrest@2.0.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-select@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.1"></script>
+
+  
+  <!-- Include jsPsych CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/jspsych@7.0.0/css/jspsych.css">
+  
+  <!-- Include Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Naskh+Arabic:wght@500&family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
+  
+  <!-- Include Adobe Fonts -->
+  <link rel="stylesheet" href="https://use.typekit.net/jpf8uok.css">
+  
+  <!-- Include additional plugins and libraries -->
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-self-paced-reading@2.0.0"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="jspsych-7-pavlovia-2021.12.js"></script>
+  
+  <!-- Include your custom JavaScript files -->
+  <script src="stimuli_variables.js"></script> <!-- Include your stimuli.js file here -->
+  <script src="stimuli.js"></script>
+  <script src="consent_trial.js"></script>
+  
+  <!-- Define custom styles -->
+  <style>
+  
+  .imageStyle {
+  height: 50px;
+  width: auto;  /* Sets a fixed width */
+  display: block;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin: 0 auto; /* Centers the image horizontally if it has width less than the container */
+}
+  </style>
+</head>
+<body>
+  <!-- Include your main JavaScript file -->
+  <script src="main.js"></script>
+</body>
+</html>
