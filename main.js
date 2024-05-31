@@ -10,7 +10,7 @@ const jsPsych = initJsPsych({
 
 // Define the total number of stimuli
 const totalStimuli = stimuli_variables.length;
-const numRandomTrials = 40;
+const numRandomTrials = 50;
 const practiceStimuli = jsPsych.randomization.sampleWithoutReplacement(stimuli_variables, numRandomTrials);
 const experimentStimuli = stimuli_variables.filter(stimulus => !practiceStimuli.includes(stimulus));
 
@@ -20,6 +20,8 @@ var timeline = [];
 
 /* Stores info received by Pavlovia */
 var pavloviaInfo;
+
+
 
 /* init connection with pavlovia.org */
 var pavlovia_init = {
@@ -33,6 +35,12 @@ setPavloviaInfo: function (info) {
 };
 timeline.push(pavlovia_init);
 
+var preload_trial = {
+  type: jsPsychPreload,
+  auto_preload: true,
+  images: stimuli_variables.map(stimulus => stimulus.ImageName),
+  show_progress_bar: true // Show progress bar
+};
 
 //enter fullscreen mode
 
@@ -93,7 +101,7 @@ var welcome = {
           type: jsPsychSurveyText,
           questions: [
               { prompt: 'What is your age?', name: 'age', placeholder: '21' },
-              { prompt: 'What is your email address?', name: 'email', placeholder: 'aa100@gmail.com'},
+              { prompt: 'What is your email address?', name: 'email', placeholder: 'aa100@gmail.com',required: true},
               { prompt: 'What is your present country of residence?', name: 'country', placeholder: 'United Arab Emirates'}
           ]
       }
@@ -149,6 +157,12 @@ timeline: [
         options: ['Left', 'Right'], 
         required: true
       },
+       {
+        prompt: "Which web broswer are you using?",
+        name: 'Browser',
+        options: ['Safari', 'Google Chrome', 'Firefox', 'Opera', 'Internet Explorer', 'Other'],
+        required: true
+      },
       {
         prompt: "Were you born and raised in a multilingual environment?",
         name: 'MultEnv',
@@ -166,7 +180,9 @@ timeline: [
         name: 'ArabicDialect',
         options: ['Egyptian', 'Levantine (Palestine, Syria, Lebanon, Jordan)', 'Iraqi', 'North African (Morocco, Algeria, Tunisia, Libya)', 'Sudanese', 'Gulf/Khaliji (UAE, Saudi Arabia, Kuwait, Bahrain, Qatar, Oman, Yemen)', 'Other'],
         required: true
-      }
+      },
+      { prompt: "What is your highest level of education?", name: 'Education', options: ['1: Less than high school', '2: High school diploma', '3: Some college', '4: Associate degree', '5: Bachelor’s degree', '6: Master’s degree', '7: Doctoral degree', '8: Professional degree (e.g., JD, MD)'], required: true },
+    { prompt: "How frequently do you read in Arabic?", name: 'ArabicReadingFrequency', options: ['1: Daily', '2: Weekly', '3: Monthly', '4: Rarely', '5: Never'], required: true }
     ],
   }
 ]
@@ -179,11 +195,11 @@ var instructions = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: `
       <p><b>Instructions:</b></p>
-      <p>Focus on the fixation cross at the center of the screen. The cross will turn <span style="color: red;">red</span> to signal the start of each trial.</p>
-      <p>Shortly after, a word will briefly appear in one of five positions near the fixation: left, right, top, bottom, or center.</p>
-      <p>Once the word disappears, the cross will turn <span style="color: green;">green</span>. At this moment, you need to respond whether the item displayed was a word or not.</p>
-      <p>Press <b><kbd>A</kbd></b> if it was a word.</p> 
-      <p>Press <b><kbd>L</kbd></b> if it was not a word.</p>
+      <p>Focus on the fixation cross (+) at the center of the screen. The cross will turn <span style="color: green;">green</span> to signal the start of each trial.</p>
+      <p>Shortly after, a word will briefly appear <b>left</b> or <b>right</b> of the fixation.</p>
+      <p>Once the word disappears, the cross will turn <span style="color: red;">red</span>. At this moment, you need to respond whether the item displayed is a real word or not.</p>
+      <p>Press <b><kbd>A</kbd></b> if it is a <b>word</b>.</p> 
+      <p>Press <b><kbd>L</kbd></b> if it is <b>not a word</b>.</p>
       <p>Respond as quickly and accurately as possible. Press <b><kbd>A</kbd></b> to begin the practice round.</p>`,
   post_trial_gap: 2000,
   choices: ["a", "l"],
@@ -192,18 +208,17 @@ timeline.push(instructions);
 
 //define fixation
 var fixation = {
-          type: jsPsychHtmlKeyboardResponse,
-          stimulus: '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 40px;">+</div>',
-          choices: 'NO_KEYS',
-          trial_duration: 800,
-          task: 'fixation',
-      };
-      
+ type: jsPsychHtmlKeyboardResponse,
+ stimulus: '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: green; font-size: 40px;">+</div>',
+  choices: 'NO_KEYS',
+  trial_duration: 800,
+task: 'fixation',
+};
 //define trial stimuli array for timeline variables 
      
 var test = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: function () {
+  stimulus: function() {
     var image = jsPsych.timelineVariable('ImageName', true);
     var position = jsPsych.timelineVariable('Position');
     var fixationCrossHtml = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px;">+</div>';
@@ -211,35 +226,25 @@ var test = {
     var offset = 7; // This sets a uniform distance from the center for all images
 
     switch(position) {
-      case 'Center':
-        // Display image at the center, no fixation cross needed
-        imgHtml = `<img src="${image}" class="imageStyle" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">`;
-        return imgHtml; // Return just the image HTML if position is center
       case 'Left':
         imgHtml = `<img src="${image}" class="imageStyle" style="position: absolute; top: 50%; left: ${50 - offset}%; transform: translateX(-50%) translateY(-50%);">`;
         break;
       case 'Right':
         imgHtml = `<img src="${image}" class="imageStyle" style="position: absolute; top: 50%; left: ${50 + offset}%; transform: translateX(-50%) translateY(-50%);">`;
         break;
-      case 'Top':
-        imgHtml = `<img src="${image}" class="imageStyle" style="position: absolute; top: ${50 - offset}%; left: 50%; transform: translateX(-50%) translateY(-50%);">`;
-        break;
-      case 'Bottom':
-        imgHtml = `<img src="${image}" class="imageStyle" style="position: absolute; top: ${50 + offset}%; left: 50%; transform: translateX(-50%) translateY(-50%);">`;
-        break;
     }
-    return fixationCrossHtml + imgHtml; // Include fixation cross with image for all positions other than center
+    
+    return fixationCrossHtml + imgHtml; // Include fixation cross with image for all positions
   },
   choices: "NO_KEYS",
-  trial_duration: 250 // This sets the duration of the trial to 250 milliseconds
+  trial_duration: 200 // This sets the duration of the trial to 200 milliseconds
 };
-
 
 // Define the backward mask (same as the forward mask)
 var backwards_mask = {
   type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px;">+</div>',
-    trial_duration: 600, // Immediate display
+    trial_duration: 500, // Immediate display
        };
 
 var response_trial = {
@@ -251,7 +256,7 @@ var response_trial = {
   <div style="position: absolute; bottom: 20%; right: 20%; font-size: 32px;">
     <span style="font-weight: bold;"><kbd>L:</kbd></span> Non-word
   </div>
-  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: green; font-size: 40px;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 40px;">
     +
   </div>`,
         choices: ["a", "l"],
@@ -343,34 +348,33 @@ var practice_debrief_block = {
   choices: ["l"],
 }
 
-var preload_trial = {
+var loaded = {
   type: jsPsychPreload,
   auto_preload: true,
-  show_progress_bar: false // hide progress bar
+  show_progress_bar: true // hide progress bar
 }
 
 // Combine the endPracticeMessage and practice_procedure in a single timeline
 var practice_timeline =  {
-  timeline: [preload_trial, fixation, test, backwards_mask, response_trial, feedback],
+  timeline: [fixation, test, backwards_mask, response_trial, feedback],
   timeline_variables: practiceStimuli,
   randomize_order: true,
   repetitions: 1,
+  on_timeline_start: function() {
+    jsPsych.data.addProperties({ phase: 'practice' });
+  },
+  on_timeline_finish: function() {
+    jsPsych.data.addProperties({ phase: null });
+  }
 };
 
 var separatorMessage = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: `<p>Now, it's time for the main experiment.</p>
-      <p>You will go through a total of 6 blocks with short breaks in between. You will not receive feedback following trials.</p>
+      <p>You will go through a total of 4-5 blocks with short breaks in between. You will not receive feedback following trials.</p>
       <p>Press <b><kbd>A</kbd></b> to begin the main experiment.</p>`,
    choices: ["a"],
 
-};
-
-var endMessage = {
-type: jsPsychHtmlKeyboardResponse,
-stimulus: `<p>You're done with the experiment.</p>
-      <p>Press any key to exit.</p>`,
-  trial_duration: 3000,
 };
 
 var chunk_debrief_block = {
@@ -421,7 +425,7 @@ trial_duration: 60000
 const doneWitIt = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: function() {
-    return `<p>You are done with the experiment. Thank you for participating. Please check your email for your participation voucher.</p>`;
+    return `<p>You are done with the experiment.</p> <p>Thank you for participating. Please check your email for your participation voucher.</p>`;
   },
   response_ends_trial: true,
   trial_duration: 6000
@@ -429,7 +433,6 @@ const doneWitIt = {
 
 var main_procedure = {
   timeline: [
-    preload_trial,
       fixation, 
       test, 
       backwards_mask, 
@@ -444,6 +447,12 @@ var main_procedure = {
   timeline_variables: experimentStimuli,
   randomize_order: true,
   repetitions: 1, // Run through all  trials once
+    on_timeline_start: function() {
+    jsPsych.data.addProperties({ phase: 'main' });
+  },
+  on_timeline_finish: function() {
+    jsPsych.data.addProperties({ phase: null });
+  }
 };
 /* finish connection with pavlovia.org */
 var pavlovia_finish = {
@@ -478,6 +487,7 @@ demographics,
 enter_fullscreen,
 distance_trial,
   instructions,
+  preload_trial,
   practice_timeline,  // Include the practice timeline
   practice_debrief_block,
   separatorMessage,
